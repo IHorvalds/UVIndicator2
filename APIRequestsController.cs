@@ -11,7 +11,7 @@ namespace UVIndicator2
 {
     internal class APIRequestsController
     {
-        private static readonly string API_KEY = "1c078e5645443748cb2586023a77cc3e";
+        private static readonly string API_KEY = "";
         public static readonly string geocodingAPIURL = "https://api.openweathermap.org/geo/1.0/direct";
         public static readonly string weatherAPIURL = "https://api.openweathermap.org/data/2.5/onecall";
 

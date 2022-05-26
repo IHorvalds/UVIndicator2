@@ -22,26 +22,29 @@ namespace UVIndicator2
         private static readonly string StartupKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
         private static readonly string StartupValue = "UVIndexApp";
         private static bool runsAtStartup = false;
+        private float scalingFactor = 1f;
 
         public WeatherForm()
         {
             InitializeComponent();
-            locationSearchBox.AutoSize = false;
-            locationSearchBox.Size = new System.Drawing.Size(locationSearchBox.Width, 28);
-            locationSearchBox.TextAlign = HorizontalAlignment.Left;
+            locationSearchBox.AutoSize = true;
+
+            timer.Interval = 60 * 60 * 1000; // 60m
+            timer.Tick += new EventHandler(Timer_Tick);
+
+            runsAtStartup = CheckIfStartupEnabled();
+            runAtStartupToolStripMenuItem.CheckState = runsAtStartup ? CheckState.Checked : CheckState.Unchecked;
+
+            this.AutoScaleDimensions = new SizeF(96f, 96f); // default 100% scaling
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.ResumeLayout(false);
+            scalingFactor = CurrentAutoScaleDimensions.Width / 96f;
 
             // Position window in bottom-right of screen
             int screenPadding = 10;
             this.StartPosition = FormStartPosition.Manual;
             this.Location = new Point(Screen.PrimaryScreen.WorkingArea.Width - this.Width - screenPadding,
                                         Screen.PrimaryScreen.WorkingArea.Height - this.Height - screenPadding);
-
-            timer.Interval = 60 * 60 * 1000; // 60m
-            timer.Tick += new EventHandler(Timer_Tick);
-
-            runsAtStartup = CheckIfStartupEnabled();
-
-            runAtStartupToolStripMenuItem.CheckState = runsAtStartup ? CheckState.Checked : CheckState.Unchecked;
         }
 
 
@@ -200,7 +203,7 @@ namespace UVIndicator2
 
             // Cleanup old icon handle
 
-            Bitmap bmp = UVBitmapGenerator.GenerateNumberIcon(approxUVI);
+            Bitmap bmp = UVBitmapGenerator.GenerateNumberIcon(approxUVI, scalingFactor);
             Bitmap squareCanvas = (Bitmap)bmp.GetThumbnailImage((int)128, (int)128, null, new IntPtr());
 
 

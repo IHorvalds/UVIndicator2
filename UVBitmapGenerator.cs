@@ -14,10 +14,10 @@ namespace UVIndicator2
     {
         private UVBitmapGenerator() { }
 
-        public static Bitmap GenerateNumberIcon(int uvi)
+        public static Bitmap GenerateNumberIcon(int uvi, float scale)
         {
-            int width = 256;
-            int height = 256;
+            int width = (int)Math.Round(256 * scale);
+            int height = (int)Math.Round(256 * scale);
 
             Bitmap iconBMP = new(width, height, PixelFormat.Format32bppArgb);
 

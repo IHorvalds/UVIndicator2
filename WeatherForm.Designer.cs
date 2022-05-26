@@ -92,8 +92,11 @@
             this.refreshButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.refreshButton.BackColor = System.Drawing.SystemColors.ScrollBar;
+            this.refreshButton.BackColor = System.Drawing.Color.Transparent;
             this.refreshButton.BackgroundImage = global::UVIndicator2.Properties.Resources.Refresh;
+            this.refreshButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.refreshButton.FlatAppearance.BorderSize = 0;
+            this.refreshButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.refreshButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.refreshButton.Location = new System.Drawing.Point(152, 5);
             this.refreshButton.Name = "refreshButton";
@@ -181,7 +184,7 @@
             // humidityLabel
             // 
             this.humidityLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.humidityLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.humidityLabel.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.humidityLabel.Location = new System.Drawing.Point(5, 5);
             this.humidityLabel.Name = "humidityLabel";
             this.humidityLabel.Size = new System.Drawing.Size(91, 23);
@@ -199,18 +202,19 @@
             // 
             // notifyIconContextMenu
             // 
+            this.notifyIconContextMenu.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.notifyIconContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openToolStripMenuItem,
             this.runAtStartupToolStripMenuItem,
             this.toolStripSeparator1,
             this.exitToolStripMenuItem});
             this.notifyIconContextMenu.Name = "notifyIconContextMenu";
-            this.notifyIconContextMenu.Size = new System.Drawing.Size(181, 98);
+            this.notifyIconContextMenu.Size = new System.Drawing.Size(149, 76);
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
             // 
@@ -218,19 +222,19 @@
             // 
             this.runAtStartupToolStripMenuItem.CheckOnClick = true;
             this.runAtStartupToolStripMenuItem.Name = "runAtStartupToolStripMenuItem";
-            this.runAtStartupToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.runAtStartupToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
             this.runAtStartupToolStripMenuItem.Text = "Run at startup";
             this.runAtStartupToolStripMenuItem.CheckedChanged += new System.EventHandler(this.RunAtStartupToolStripMenuItem_CheckedChanged);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(145, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
             // 
