@@ -18,7 +18,7 @@ namespace UVIndicator2
             //To run and also use it when we need to bring to front
             mainForm = form;
             this.IsSingleInstance = true;
-            this.StartupNextInstance += this_StartupNextInstance;
+            this.StartupNextInstance += this_StartupNextInstance; 
         }
 
         void this_StartupNextInstance(object sender, StartupNextInstanceEventArgs e)

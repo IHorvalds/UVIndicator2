@@ -22,23 +22,25 @@ namespace UVIndicator2
         private static readonly string StartupKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
         private static readonly string StartupValue = "UVIndexApp";
         private static bool runsAtStartup = false;
-        private float scalingFactor = 1f;
+        private readonly float scalingFactor = 1f;
 
         public WeatherForm()
         {
             InitializeComponent();
-            locationSearchBox.AutoSize = true;
+            
+            this.AutoScaleDimensions = new SizeF(96f, 96f); // default 100% scaling
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.ResumeLayout(false);
 
+            scalingFactor = CurrentAutoScaleDimensions.Width / 96f;
             timer.Interval = 60 * 60 * 1000; // 60m
             timer.Tick += new EventHandler(Timer_Tick);
 
             runsAtStartup = CheckIfStartupEnabled();
             runAtStartupToolStripMenuItem.CheckState = runsAtStartup ? CheckState.Checked : CheckState.Unchecked;
 
-            this.AutoScaleDimensions = new SizeF(96f, 96f); // default 100% scaling
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ResumeLayout(false);
-            scalingFactor = CurrentAutoScaleDimensions.Width / 96f;
+            SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
+
 
             // Position window in bottom-right of screen
             int screenPadding = 10;
@@ -47,6 +49,18 @@ namespace UVIndicator2
                                         Screen.PrimaryScreen.WorkingArea.Height - this.Height - screenPadding);
         }
 
+        private async void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
+        {
+            if (e.Mode == PowerModes.Resume)
+            {
+                ResetTimer();
+                await RefreshWeather();
+            }
+            if (e.Mode == PowerModes.Suspend)
+            {
+                timer.Enabled= false;
+            }
+        }
 
         private void NotifyIcon_MouseClick(object sender, MouseEventArgs e)
         {
@@ -76,7 +90,10 @@ namespace UVIndicator2
             {
                 e.Cancel = true;
                 this.Hide();
+                return;
             }
+
+            SystemEvents.PowerModeChanged -= SystemEvents_PowerModeChanged;
         }
 
         private async void LocationSearchBox_KeyUp(object sender, KeyEventArgs e)

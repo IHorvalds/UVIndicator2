@@ -138,7 +138,7 @@
             // temperatureLabel
             // 
             this.temperatureLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.temperatureLabel.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.temperatureLabel.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.temperatureLabel.Location = new System.Drawing.Point(5, 5);
             this.temperatureLabel.Margin = new System.Windows.Forms.Padding(0);
             this.temperatureLabel.Name = "temperatureLabel";
@@ -209,32 +209,33 @@
             this.toolStripSeparator1,
             this.exitToolStripMenuItem});
             this.notifyIconContextMenu.Name = "notifyIconContextMenu";
-            this.notifyIconContextMenu.Size = new System.Drawing.Size(149, 76);
+            this.notifyIconContextMenu.Size = new System.Drawing.Size(181, 98);
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
             // 
             // runAtStartupToolStripMenuItem
             // 
             this.runAtStartupToolStripMenuItem.CheckOnClick = true;
+            this.runAtStartupToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.runAtStartupToolStripMenuItem.Name = "runAtStartupToolStripMenuItem";
-            this.runAtStartupToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+            this.runAtStartupToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.runAtStartupToolStripMenuItem.Text = "Run at startup";
             this.runAtStartupToolStripMenuItem.CheckedChanged += new System.EventHandler(this.RunAtStartupToolStripMenuItem_CheckedChanged);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(145, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
             // 
