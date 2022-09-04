@@ -24,6 +24,10 @@ namespace UVIndicator2
         private static bool runsAtStartup = false;
         private readonly float scalingFactor = 1f;
 
+        private readonly Dictionary<string, int> intervalOptions = new Dictionary<string, int>();
+
+        private string lastRefreshedTime = "";
+
         public WeatherForm()
         {
             InitializeComponent();
@@ -31,22 +35,70 @@ namespace UVIndicator2
             this.AutoScaleDimensions = new SizeF(96f, 96f); // default 100% scaling
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ResumeLayout(false);
-
             scalingFactor = CurrentAutoScaleDimensions.Width / 96f;
-            timer.Interval = 60 * 60 * 1000; // 60m
+
+
+
+            intervalOptions.Add("one_hour", 60 * 60 * 1000);
+            intervalOptions.Add("half_hour", 30 * 60 * 1000);
+
+            string refresh_interval = uvis.RefreshInterval;
+            if (refresh_interval != "manual")
+            {
+                timer.Interval = intervalOptions[refresh_interval];
+            } else
+            {
+                timer.Interval = 24 * 60 * 60 * 1000; // 60m
+                timer.Enabled = false;
+            }
             timer.Tick += new EventHandler(Timer_Tick);
 
+            foreach(ToolStripMenuItem item in refreshIntervalToolStripMenuItem.DropDownItems)
+            {
+                string tag = (string)item.Tag;
+                if (refresh_interval == tag)
+                {
+                    item.Checked = true;
+                }
+
+                item.Click += SelectRefreshInterval;
+            }
+
+            
+            
             runsAtStartup = CheckIfStartupEnabled();
             runAtStartupToolStripMenuItem.CheckState = runsAtStartup ? CheckState.Checked : CheckState.Unchecked;
 
+            
             SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
+            SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
+            SystemEvents.SessionEnding += SystemEvents_SessionEnding;
 
 
+            
             // Position window in bottom-right of screen
-            int screenPadding = 10;
+            int screenPadding = 0;
             this.StartPosition = FormStartPosition.Manual;
             this.Location = new Point(Screen.PrimaryScreen.WorkingArea.Width - this.Width - screenPadding,
                                         Screen.PrimaryScreen.WorkingArea.Height - this.Height - screenPadding);
+        }
+
+        private async void SystemEvents_SessionSwitch(object sender, SessionSwitchEventArgs e)
+        {
+            switch(e.Reason)
+            {
+                case SessionSwitchReason.SessionLogoff:
+                case SessionSwitchReason.SessionLock:
+                    timer.Stop();
+                break;
+
+                case SessionSwitchReason.SessionLogon:
+                case SessionSwitchReason.SessionUnlock:
+                    ResetTimer();
+                    await RefreshWeather();
+                break;
+
+            }
         }
 
         private async void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
@@ -58,8 +110,16 @@ namespace UVIndicator2
             }
             if (e.Mode == PowerModes.Suspend)
             {
-                timer.Enabled= false;
+                timer.Enabled = false;
             }
+        }
+
+        private void SystemEvents_SessionEnding(object sender, SessionEndingEventArgs e)
+        {
+            timer.Stop();
+            SystemEvents.PowerModeChanged -= SystemEvents_PowerModeChanged;
+            SystemEvents.SessionSwitch -= SystemEvents_SessionSwitch;
+            SystemEvents.SessionEnding -= SystemEvents_SessionEnding;
         }
 
         private void NotifyIcon_MouseClick(object sender, MouseEventArgs e)
@@ -79,11 +139,6 @@ namespace UVIndicator2
             }
         }
 
-        private void WeatherForm_VisibleChanged(object sender, EventArgs e)
-        {
-            this.notifyIcon.Visible = !this.Visible;
-        }
-
         private void WeatherForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (e.CloseReason == CloseReason.UserClosing)
@@ -92,15 +147,13 @@ namespace UVIndicator2
                 this.Hide();
                 return;
             }
-
-            SystemEvents.PowerModeChanged -= SystemEvents_PowerModeChanged;
         }
 
         private async void LocationSearchBox_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                uvis.SavedLocation = locationSearchBox.Text;
+                uvis.SavedLocation = locationSearchBox.Text.Trim();
                 uvis.Save();
                 ResetTimer();
                 await RefreshWeather();
@@ -110,6 +163,9 @@ namespace UVIndicator2
         private async void WeatherForm_Load(object sender, EventArgs e)
         {
             locationSearchBox.DataBindings.Add(new Binding("Text", uvis, "SavedLocation"));
+            locationSearchBox.DeselectAll();
+            locationSearchBox.ScrollToCaret();
+            ResetTimer();
             await RefreshWeather();
         }
 
@@ -179,17 +235,51 @@ namespace UVIndicator2
             await RefreshWeather();
         }
 
+        private async void SelectRefreshInterval(object sender, EventArgs e)
+        {
+            timer.Stop();
+            ToolStripMenuItem menuItem = (ToolStripMenuItem)sender;
+            uvis.RefreshInterval = (string)menuItem.Tag;
+            uvis.Save();
+            
+            for(int i = 0; i < refreshIntervalToolStripMenuItem.DropDownItems.Count; ++i)
+            {
+                ToolStripMenuItem item = (ToolStripMenuItem)refreshIntervalToolStripMenuItem.DropDownItems[i];
+                if (item == menuItem)
+                {
+                    item.Checked = true;
+                    string tag = (string)item.Tag;
+                    if (tag != "manual")
+                    {
+                        timer.Interval = intervalOptions[tag];
+                        timer.Start();
+                        await RefreshWeather();
+                    } else
+                    {
+                        timer.Interval = 24 * 60 * 60 * 1000;
+                    }
+                }
+                else
+                {
+                    item.Checked = false;
+                }
+            }
+        }
+
         private void ResetTimer()
         {
-            // Does this make sense???
-            timer.Enabled = false;
-            timer.Enabled = true;
+            if (uvis.RefreshInterval != "manual")
+            {
+                timer.Stop();
+                timer.Start();
+            }
         }
 
         private async Task RefreshWeather()
         {
             Debug.WriteLine("refreshed");
-            string location = locationSearchBox.Text.Trim();
+            string location = uvis.SavedLocation;
+            lastRefreshedTime = DateTime.Now.ToString("HH:mm");
             if (location != "")
             {
                 (string, string)? coord = await APIRequestsController.GetLocationCoordinates(location);
@@ -216,6 +306,8 @@ namespace UVIndicator2
             humidityLabel.Text = $"Humidity: {humidity}%";
             uvIndexLabel.Text = $"UV: {uvi}";
 
+            lastRefreshToolTip.SetToolTip(refreshButton, $"Last refreshed at {lastRefreshedTime}");
+
             int approxUVI = (int)Math.Round(uvi);
 
             // Cleanup old icon handle
@@ -228,6 +320,7 @@ namespace UVIndicator2
             Icon iconResult = Icon.FromHandle(iconHandle);
 
             notifyIcon.Icon = (Icon)iconResult.Clone();
+            notifyIcon.Text = $"Last refreshed at {lastRefreshedTime}";
             DestroyIcon(iconHandle);
         }
 

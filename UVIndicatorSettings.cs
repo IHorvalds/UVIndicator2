@@ -22,5 +22,19 @@ namespace UVIndicator2
                 this["SavedLocation"] = (string)value;
             }
         }
+
+        [UserScopedSetting()]
+        [DefaultSettingValue("one_hour")]
+        public string RefreshInterval
+        {
+            get
+            {
+                return ((string)this["RefreshInterval"]);
+            }
+            set
+            {
+                this["RefreshInterval"] = (string)value;
+            }
+        }
     }
 }
